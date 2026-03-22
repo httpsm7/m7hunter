@@ -1,0 +1,81 @@
+id: m7-exposed-debug-endpoints
+
+info:
+  name: M7 - Exposed Debug/Admin Endpoints
+  author: Sharlix
+  severity: high
+  description: |
+    Detects exposed debug, admin, and development endpoints
+    that are commonly left open by developers.
+  tags: exposure,debug,admin,m7hunter
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}/debug"
+      - "{{BaseURL}}/debug/pprof"
+      - "{{BaseURL}}/debug/vars"
+      - "{{BaseURL}}/_debug"
+      - "{{BaseURL}}/admin"
+      - "{{BaseURL}}/admin/config"
+      - "{{BaseURL}}/phpinfo.php"
+      - "{{BaseURL}}/info.php"
+      - "{{BaseURL}}/.env"
+      - "{{BaseURL}}/.env.local"
+      - "{{BaseURL}}/.env.production"
+      - "{{BaseURL}}/.env.backup"
+      - "{{BaseURL}}/config.json"
+      - "{{BaseURL}}/config.yml"
+      - "{{BaseURL}}/config.yaml"
+      - "{{BaseURL}}/app.config"
+      - "{{BaseURL}}/web.config"
+      - "{{BaseURL}}/application.properties"
+      - "{{BaseURL}}/application.yml"
+      - "{{BaseURL}}/settings.py"
+      - "{{BaseURL}}/local_settings.py"
+      - "{{BaseURL}}/database.yml"
+      - "{{BaseURL}}/.git/config"
+      - "{{BaseURL}}/.git/HEAD"
+      - "{{BaseURL}}/Dockerfile"
+      - "{{BaseURL}}/docker-compose.yml"
+      - "{{BaseURL}}/docker-compose.yaml"
+      - "{{BaseURL}}/.htpasswd"
+      - "{{BaseURL}}/wp-config.php.bak"
+      - "{{BaseURL}}/backup.sql"
+      - "{{BaseURL}}/dump.sql"
+
+    matchers-condition: or
+    matchers:
+      - type: word
+        words:
+          - "DB_PASSWORD"
+          - "DATABASE_URL"
+          - "AWS_SECRET"
+          - "API_KEY"
+          - "SECRET_KEY"
+          - "mysql://"
+          - "postgres://"
+          - "mongodb://"
+        part: body
+
+      - type: word
+        words:
+          - "phpinfo()"
+          - "PHP Version"
+        part: body
+
+      - type: word
+        words:
+          - "goroutine"
+          - "heap"
+          - "cmdline"
+        part: body
+
+      - type: status
+        status:
+          - 200
+        condition: and
+        words:
+          - "[core]"
+          - "repositoryformatversion"
+        part: body
