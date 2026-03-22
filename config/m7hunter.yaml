@@ -1,0 +1,73 @@
+# M7Hunter v3.0 — Configuration File
+# MilkyWay Intelligence | Author: Sharlix
+# Copy to: m7hunter.yaml (project root) or ~/.m7hunter.yaml
+#
+# Usage: sudo m7hunter -u target.com -c m7hunter.yaml
+# Or:    place as m7hunter.yaml in tool directory (auto-loaded)
+# ═══════════════════════════════════════════════════════════
+
+# ── API Keys ────────────────────────────────────────────────
+# GitHub token for dorking (get from github.com/settings/tokens)
+github_token:
+
+# Shodan API key (shodan.io)
+shodan_key:
+
+# VirusTotal API key (virustotal.com)
+vt_key:
+
+# WPScan API token (wpscan.com)
+wpscan_token:
+
+# Custom Interactsh server URL (leave blank for auto public server)
+# interactsh_url: https://your-server.com
+
+# ── Notifications ───────────────────────────────────────────
+# Telegram Bot Token (from @BotFather)
+telegram_token:
+
+# Telegram Chat ID (use @userinfobot to find)
+telegram_chat:
+
+# Discord Webhook URL
+discord_webhook:
+
+# ── Scan Defaults ───────────────────────────────────────────
+# Default thread count
+threads: 50
+
+# Default rate limit (requests/sec for naabu)
+rate: 1000
+
+# Default per-tool timeout in seconds
+timeout: 300
+
+# Default output directory
+# output: results
+
+# HTTP proxy (e.g. Burp: http://127.0.0.1:8080)
+# proxy: http://127.0.0.1:8080
+
+# ── Timeouts (per tool, in seconds) ─────────────────────────
+timeout_gau: 120
+timeout_amass: 300
+timeout_nuclei: 1800
+timeout_sqlmap: 600
+timeout_nmap: 900
+
+# ── Auth (for authenticated scanning) ───────────────────────
+# Session cookie
+# cookie: session=your_session_value_here
+
+# Custom headers file path (one "Key: Value" per line)
+# headers: /path/to/headers.txt
+
+# Basic auth
+# auth: username:password
+
+# ── Scope ───────────────────────────────────────────────────
+# File with in-scope domains/IPs (one per line)
+# scope: scope.txt
+
+# File with patterns to exclude
+# exclude: exclude.txt
