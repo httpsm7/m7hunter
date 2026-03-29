@@ -1,0 +1,21 @@
+id: m7-redirect-data-uri
+info:
+  name: M7 - Open Redirect via Data URI
+  author: Sharlix
+  severity: medium
+  description: Open redirect using data: URI to load attacker content
+  tags: redirect,data-uri,m7hunter
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}?url=data:text/html,<script>alert(1)</script>"
+      - "{{BaseURL}}?redirect=data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg=="
+      - "{{BaseURL}}?next=data:text/html,%3Cscript%3Ealert(1)%3C%2Fscript%3E"
+
+    matchers-condition: or
+    matchers:
+      - type: regex
+        regex:
+          - "Location:.*data:"
+        part: header

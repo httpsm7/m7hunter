@@ -1,0 +1,32 @@
+id: m7-exposure-swagger
+info:
+  name: M7 - Exposed Swagger/OpenAPI Documentation
+  author: Sharlix
+  severity: medium
+  description: Swagger UI exposed — full API documentation accessible
+  tags: exposure,swagger,api,m7hunter
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}/swagger"
+      - "{{BaseURL}}/swagger-ui.html"
+      - "{{BaseURL}}/swagger/index.html"
+      - "{{BaseURL}}/swagger/v1"
+      - "{{BaseURL}}/api-docs"
+      - "{{BaseURL}}/v1/api-docs"
+      - "{{BaseURL}}/openapi.json"
+      - "{{BaseURL}}/swagger.json"
+      - "{{BaseURL}}/swagger.yaml"
+      - "{{BaseURL}}/api/swagger.json"
+
+    matchers-condition: or
+    matchers:
+      - type: word
+        words:
+          - "swagger-ui"
+          - "Swagger UI"
+          - ""swagger": "2.0""
+          - ""openapi": "3."
+        part: body
+        condition: or

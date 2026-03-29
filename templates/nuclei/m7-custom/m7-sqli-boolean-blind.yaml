@@ -1,0 +1,21 @@
+id: m7-sqli-boolean-blind
+info:
+  name: M7 - Blind Boolean-Based SQL Injection
+  author: Sharlix
+  severity: critical
+  description: Boolean-based blind SQLi using response length difference as signal
+  tags: sqli,blind,boolean,m7hunter
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}?id=1 AND 1=1"
+      - "{{BaseURL}}?id=1 AND 1=2"
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code_1 == 200"
+          - "status_code_2 == 200"
+          - "abs(len(body_1) - len(body_2)) > 50"

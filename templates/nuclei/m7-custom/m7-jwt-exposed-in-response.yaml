@@ -1,0 +1,21 @@
+id: m7-jwt-exposed-in-response
+info:
+  name: M7 - JWT Token Exposure in API Response
+  author: Sharlix
+  severity: medium
+  description: Detects JWT tokens accidentally exposed in API responses
+  tags: jwt,exposure,m7hunter
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}/api"
+      - "{{BaseURL}}/api/v1"
+      - "{{BaseURL}}/api/debug"
+      - "{{BaseURL}}/api/info"
+
+    matchers:
+      - type: regex
+        regex:
+          - "eyJ[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]+"
+        part: body

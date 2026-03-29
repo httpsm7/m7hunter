@@ -1,0 +1,25 @@
+id: m7-jwt-no-expiry
+info:
+  name: M7 - JWT Missing Expiration Claim
+  author: Sharlix
+  severity: medium
+  description: Detects JWT tokens without exp claim (never-expiring tokens)
+  tags: jwt,expiry,m7hunter
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}/api/login"
+      - "{{BaseURL}}/api/auth"
+      - "{{BaseURL}}/login"
+
+    matchers-condition: and
+    matchers:
+      - type: regex
+        regex:
+          - "eyJ[A-Za-z0-9_-]+\.eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+"
+        part: body
+
+      - type: dsl
+        dsl:
+          - "!contains(body, '"exp"')"

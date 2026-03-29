@@ -1,0 +1,24 @@
+id: m7-exposure-aws-keys
+info:
+  name: M7 - AWS Access Key Exposure
+  author: Sharlix
+  severity: critical
+  description: Detects exposed AWS access keys in responses and files
+  tags: exposure,aws,secrets,m7hunter
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}"
+      - "{{BaseURL}}/api"
+      - "{{BaseURL}}/.git/config"
+      - "{{BaseURL}}/credentials"
+      - "{{BaseURL}}/aws/credentials"
+
+    matchers:
+      - type: regex
+        regex:
+          - "AKIA[0-9A-Z]{16}"
+          - "ASIA[0-9A-Z]{16}"
+          - "AROA[0-9A-Z]{16}"
+        part: body

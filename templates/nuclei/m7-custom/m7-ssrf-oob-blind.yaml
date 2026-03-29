@@ -1,0 +1,27 @@
+id: m7-ssrf-oob-blind
+info:
+  name: M7 - Blind SSRF via OOB Callback
+  author: Sharlix
+  severity: high
+  description: Detects blind SSRF using out-of-band DNS/HTTP callbacks
+  tags: ssrf,blind,oob,interactsh,m7hunter
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}?url=http://{{interactsh-url}}"
+      - "{{BaseURL}}?redirect=http://{{interactsh-url}}"
+      - "{{BaseURL}}?src=http://{{interactsh-url}}"
+      - "{{BaseURL}}?uri=http://{{interactsh-url}}"
+      - "{{BaseURL}}?fetch=http://{{interactsh-url}}"
+      - "{{BaseURL}}?proxy=http://{{interactsh-url}}"
+      - "{{BaseURL}}?image=http://{{interactsh-url}}"
+      - "{{BaseURL}}?file=http://{{interactsh-url}}"
+
+    matchers:
+      - type: word
+        part: interactsh_protocol
+        words:
+          - "http"
+          - "dns"
+        condition: or

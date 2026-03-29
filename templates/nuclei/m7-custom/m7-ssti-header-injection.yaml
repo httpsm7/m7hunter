@@ -1,0 +1,24 @@
+id: m7-ssti-header-injection
+info:
+  name: M7 - SSTI via HTTP Header Injection
+  author: Sharlix
+  severity: high
+  description: SSTI via User-Agent, Referer, or custom headers that get rendered
+  tags: ssti,headers,m7hunter
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}"
+
+    headers:
+      User-Agent: "{{7*7}}"
+      Referer: "{{7*7}}"
+      X-Custom-Header: "{{7*7}}"
+      X-Forwarded-For: "{{7*7}}"
+
+    matchers:
+      - type: word
+        words:
+          - "49"
+        part: body

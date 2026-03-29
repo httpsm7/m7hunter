@@ -1,0 +1,22 @@
+id: m7-cors-http-trust
+info:
+  name: M7 - CORS Trusts HTTP Origin (not HTTPS)
+  author: Sharlix
+  severity: medium
+  description: CORS allows HTTP origin which is insecure
+  tags: cors,http,m7hunter
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}/api"
+
+    headers:
+      Origin: "http://evil.com"
+
+    matchers-condition: and
+    matchers:
+      - type: word
+        words:
+          - "Access-Control-Allow-Origin: http://evil.com"
+        part: header

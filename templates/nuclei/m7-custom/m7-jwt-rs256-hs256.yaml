@@ -1,0 +1,24 @@
+id: m7-jwt-rs256-hs256
+info:
+  name: M7 - JWT RS256 to HS256 Algorithm Confusion
+  author: Sharlix
+  severity: critical
+  description: Algorithm confusion attack — RS256 server tricked to use HS256 with public key
+  tags: jwt,algorithm-confusion,rs256,hs256,m7hunter
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}/.well-known/jwks.json"
+      - "{{BaseURL}}/api/jwks"
+      - "{{BaseURL}}/auth/jwks"
+      - "{{BaseURL}}/oauth/jwks"
+
+    matchers:
+      - type: word
+        words:
+          - ""kty":"
+          - ""n":"
+          - ""e":"
+        part: body
+        condition: and

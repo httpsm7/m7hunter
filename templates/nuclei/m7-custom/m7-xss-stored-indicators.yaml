@@ -1,0 +1,32 @@
+id: m7-xss-stored-indicators
+info:
+  name: M7 - Stored XSS Indicator Detection
+  author: Sharlix
+  severity: high
+  description: Detects stored XSS by checking if injected payload persists in responses
+  tags: xss,stored,m7hunter
+
+requests:
+  - method: POST
+    path:
+      - "{{BaseURL}}/comment"
+      - "{{BaseURL}}/post"
+      - "{{BaseURL}}/message"
+      - "{{BaseURL}}/feedback"
+      - "{{BaseURL}}/review"
+      - "{{BaseURL}}/submit"
+
+    body: |
+      name=m7stored&comment=<script>alert('m7xss_stored')</script>&message=<img src=x onerror=alert('m7')>
+
+    headers:
+      Content-Type: application/x-www-form-urlencoded
+
+    matchers-condition: or
+    matchers:
+      - type: word
+        words:
+          - "m7xss_stored"
+          - "<script>alert('m7"
+        part: body
+        condition: or

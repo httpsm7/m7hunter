@@ -1,0 +1,28 @@
+id: m7-idor-uuid
+info:
+  name: M7 - IDOR UUID/GUID Parameter Testing
+  author: Sharlix
+  severity: high
+  description: Tests UUID parameters for IDOR — sequential or predictable UUIDs
+  tags: idor,uuid,m7hunter
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}/api/user/00000000-0000-0000-0000-000000000001"
+      - "{{BaseURL}}/api/user/00000000-0000-0000-0000-000000000002"
+      - "{{BaseURL}}/api/document/00000000-0000-0000-0000-000000000001"
+      - "{{BaseURL}}/api/file/00000000-0000-0000-0000-000000000001"
+      - "{{BaseURL}}/api/order/00000000-0000-0000-0000-000000000001"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+
+      - type: dsl
+        dsl:
+          - "len(body) > 50"
+          - "!contains(body, 'not found') && !contains(body, 'invalid')"
+        condition: and

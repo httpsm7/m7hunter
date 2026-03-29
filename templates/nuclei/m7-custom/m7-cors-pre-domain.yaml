@@ -1,0 +1,21 @@
+id: m7-cors-pre-domain
+info:
+  name: M7 - CORS Pre-domain Bypass (evil.com as prefix)
+  author: Sharlix
+  severity: high
+  description: CORS regex bypass using target domain as suffix of attacker domain
+  tags: cors,bypass,regex,m7hunter
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}/api"
+
+    headers:
+      Origin: "https://{{Hostname}}.evil.com"
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "contains(all_headers, concat('Access-Control-Allow-Origin: https://', host, '.evil.com'))"

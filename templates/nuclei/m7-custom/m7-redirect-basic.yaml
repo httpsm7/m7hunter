@@ -1,0 +1,37 @@
+id: m7-redirect-basic
+info:
+  name: M7 - Open Redirect Basic Detection
+  author: Sharlix
+  severity: medium
+  description: Tests common redirect parameters for open redirect
+  tags: redirect,m7hunter
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}?redirect=https://evil.com"
+      - "{{BaseURL}}?url=https://evil.com"
+      - "{{BaseURL}}?next=https://evil.com"
+      - "{{BaseURL}}?return=https://evil.com"
+      - "{{BaseURL}}?returnurl=https://evil.com"
+      - "{{BaseURL}}?goto=https://evil.com"
+      - "{{BaseURL}}?continue=https://evil.com"
+      - "{{BaseURL}}?forward=https://evil.com"
+      - "{{BaseURL}}?destination=https://evil.com"
+      - "{{BaseURL}}?redir=https://evil.com"
+      - "{{BaseURL}}?to=https://evil.com"
+      - "{{BaseURL}}?target=https://evil.com"
+
+    matchers-condition: and
+    matchers:
+      - type: word
+        words:
+          - "https://evil.com"
+        part: header
+
+      - type: status
+        status:
+          - 301
+          - 302
+          - 307
+          - 308

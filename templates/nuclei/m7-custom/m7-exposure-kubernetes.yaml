@@ -1,0 +1,32 @@
+id: m7-exposure-kubernetes
+info:
+  name: M7 - Kubernetes API Exposure
+  author: Sharlix
+  severity: critical
+  description: Kubernetes API server or dashboard exposed without auth
+  tags: exposure,kubernetes,k8s,m7hunter
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}/api/v1/namespaces"
+      - "{{BaseURL}}/api/v1/pods"
+      - "{{BaseURL}}/api/v1/secrets"
+      - "{{BaseURL}}:8001/api/v1"
+      - "{{BaseURL}}:6443/api/v1"
+      - "{{BaseURL}}/api"
+
+    matchers-condition: and
+    matchers:
+      - type: word
+        words:
+          - "apiVersion"
+          - "kind"
+          - "namespace"
+          - "kubernetes"
+        part: body
+        condition: or
+
+      - type: status
+        status:
+          - 200

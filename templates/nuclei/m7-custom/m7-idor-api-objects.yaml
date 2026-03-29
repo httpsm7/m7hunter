@@ -1,0 +1,34 @@
+id: m7-idor-api-objects
+info:
+  name: M7 - IDOR in REST API Object References
+  author: Sharlix
+  severity: high
+  description: IDOR via REST API endpoints with predictable object IDs
+  tags: idor,api,rest,m7hunter
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}/api/v1/users/1/profile"
+      - "{{BaseURL}}/api/v1/users/2/profile"
+      - "{{BaseURL}}/api/v1/accounts/1"
+      - "{{BaseURL}}/api/v1/accounts/2"
+      - "{{BaseURL}}/api/v1/transactions/1"
+      - "{{BaseURL}}/api/v1/messages/1"
+      - "{{BaseURL}}/api/v1/documents/1"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+
+      - type: word
+        words:
+          - "email"
+          - "phone"
+          - "address"
+          - "username"
+          - "account"
+        part: body
+        condition: or

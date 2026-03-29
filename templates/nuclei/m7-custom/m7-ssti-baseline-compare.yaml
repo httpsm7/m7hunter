@@ -1,0 +1,21 @@
+id: m7-ssti-baseline-compare
+info:
+  name: M7 - SSTI Baseline Comparison (FP Killer)
+  author: Sharlix
+  severity: high
+  description: SSTI detection using baseline comparison to eliminate false positives
+  tags: ssti,baseline,fp-reduction,m7hunter
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}?name=plaintext_baseline_m7"
+      - "{{BaseURL}}?name={{7*7}}"
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "!contains(body_1, '49')"
+          - "contains(body_2, '49')"
+          - "abs(len(body_1) - len(body_2)) > 0"

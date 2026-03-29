@@ -1,0 +1,23 @@
+id: m7-takeover-fastly
+info:
+  name: M7 - Fastly CDN Subdomain Takeover
+  author: Sharlix
+  severity: high
+  description: Detects unclaimed Fastly CDN subdomain
+  tags: takeover,fastly,cdn,m7hunter
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}"
+
+    matchers-condition: and
+    matchers:
+      - type: word
+        words:
+          - "Fastly error: unknown domain"
+        part: body
+
+      - type: status
+        status:
+          - 500

@@ -1,0 +1,20 @@
+id: m7-ssrf-baseline-compare
+info:
+  name: M7 - SSRF Baseline vs Injected Response Comparison
+  author: Sharlix
+  severity: high
+  description: Compares baseline vs SSRF-injected response to eliminate false positives
+  tags: ssrf,baseline,fp-reduction,m7hunter
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}?url=https://google.com"
+      - "{{BaseURL}}?url=http://127.0.0.1"
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code_1 == status_code_2"
+          - "abs(len(body_1) - len(body_2)) > 100"

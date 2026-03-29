@@ -1,0 +1,27 @@
+id: m7-graphql-field-suggestion
+info:
+  name: M7 - GraphQL Field Suggestion (Info Disclosure)
+  author: Sharlix
+  severity: low
+  description: GraphQL returns field suggestions on errors — reveals schema information
+  tags: graphql,disclosure,m7hunter
+
+requests:
+  - method: POST
+    path:
+      - "{{BaseURL}}/graphql"
+      - "{{BaseURL}}/api/graphql"
+
+    body: '{"query":"{ __schema { invalidField } }"}'
+    headers:
+      Content-Type: application/json
+
+    matchers-condition: or
+    matchers:
+      - type: word
+        words:
+          - "Did you mean"
+          - "did you mean"
+          - "Suggestions"
+        part: body
+        condition: or

