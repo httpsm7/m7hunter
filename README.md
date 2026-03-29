@@ -1,4 +1,4 @@
-# 👁 M7Hunter v3.0 — World's #1 Bug Bounty Pipeline
+# 👁 M7Hunter v5.0 — World's #1 Bug Bounty Pipeline
 
 ```
         /\
@@ -6,204 +6,282 @@
       /    \
      /  👁  \
     /________\
-  ══════════════════════════════
-  World's #1 Bug Bounty Pipeline
+  ══════════════════════════════════════════════════
+  Dual-Phase · Confidence Scoring · Proof Engine
+  OSINT Module · Telegram Bot · 108 Custom Templates
 ```
 
-**M7Hunter v3.0** — Advanced automated bug bounty and penetration testing pipeline.  
-Built from scratch. No compromises.
-
-**Made by MilkyWay Intelligence | Author: Sharlix**
+**M7Hunter v5.0** — Complete automated bug bounty and pentest pipeline.
+Built by MilkyWay Intelligence | Author: Sharlix
 
 ---
 
-## ⚡ What's New in v3.0
+## ⚡ What's New in v5.0
 
-| Feature | v2.0 | v3.0 |
+| Feature | v4.0 | v5.0 |
 |---------|------|------|
-| Parallel vuln scanning | ❌ | ✅ (5x faster) |
-| OOB/Interactsh blind detection | ❌ | ✅ |
-| Telegram/Discord alerts | ❌ | ✅ |
-| Authenticated scanning (cookie/headers) | ❌ | ✅ |
-| Config file (YAML) | ❌ | ✅ |
-| Continuous recon mode | ❌ | ✅ |
-| GitHub dorking | ❌ | ✅ |
-| Cloud asset enumeration (S3/GCP/Azure) | ❌ | ✅ |
-| SSTI detection | ❌ | ✅ |
-| JWT analysis + cracking | ❌ | ✅ |
-| GraphQL testing | ❌ | ✅ |
-| Host header injection | ❌ | ✅ |
-| Adaptive timeout (no gau/amass hangs) | ❌ | ✅ |
-| Filterable HTML report | ❌ | ✅ |
-| Markdown report (HackerOne ready) | ❌ | ✅ |
-| Scope file support | ❌ | ✅ |
-| False positive deduplication | ❌ | ✅ |
-| nmap/subzy bug fixed | ❌ | ✅ |
-| sqlmap confirmed-only findings | ❌ | ✅ |
+| Dual-phase scan (Fast → Deep) | ❌ | ✅ |
+| Confidence scoring (0.0–1.0) | ❌ | ✅ |
+| Proof Engine (curl + HTTP + repro) | ❌ | ✅ |
+| CVSS-like risk scoring | ❌ | ✅ |
+| OSINT module (Shodan/Censys/FOFA/crt.sh) | ❌ | ✅ |
+| Telegram bot control | ❌ | ✅ (full bot) |
+| `--open-your-brain` data viewer | ❌ | ✅ |
+| Structured audit logs (scan ID) | ❌ | ✅ |
+| Custom Nuclei templates | 3 | 108 (105 new) |
+| FP filtering | Pattern-based | Multi-signal + AI |
 
 ---
 
 ## 🚀 Quick Start
 
 ```bash
-# 1. Clone
-git clone https://github.com/httpsm7/m7hunter.git
-cd m7hunter
-
-# 2. Install all tools
+# 1. Install
 sudo bash install.sh
 
-# 3. Run
+# 2. Fast scan (Phase 1 only)
+sudo m7hunter -u example.com --fast
+
+# 3. Full deep scan (Phase 1 + Phase 2)
 sudo m7hunter -u example.com --deep
+
+# 4. Deep + OSINT + Proof
+sudo m7hunter -u example.com --deep --osint --proof
 ```
 
 ---
 
-## 🔧 Usage
+## 🎯 Dual-Phase Architecture
 
-```
-sudo m7hunter -u <target> [mode] [options]
-sudo m7hunter -f <targets.txt> [mode] [options]
-```
+### Phase 1 — Fast Scan
+Lightweight signal detection. Runs these steps:
+`subdomain → dns → probe → nuclei → xss → ssrf → takeover → github → idor → redirect`
 
-### Scan Modes
+**Goal:** Find suspicious endpoints quickly.
 
-| Mode | Description |
-|------|-------------|
-| `--quick` | Fast recon: subdomain + DNS + probe + nuclei + XSS + takeover + GitHub |
-| `--deep` | Full pipeline: all 21 steps |
-| `--stealth` | Deep + Tor + slow jitter |
-| `--custom` | Pick steps manually |
-| `--continuous` | Repeat scan on interval (default 1h) |
+### Phase 2 — Deep Confirmation
+Triggered automatically after Phase 1. Runs:
+`ports → crawl → sqli → cors → lfi → screenshot → wpscan → cloud → ssti → jwt → graphql → host_header → xxe → smuggling`
 
-### Auth Options (Burp Pro style)
+**Goal:** Confirm Phase 1 findings + deep coverage.
 
 ```bash
-# Cookie-based auth
-sudo m7hunter -u target.com --deep --cookie "session=abc123; csrf=xyz"
-
-# Custom headers file
-sudo m7hunter -u target.com --deep --headers headers.txt
-
-# Basic auth
-sudo m7hunter -u target.com --deep --auth admin:password
-```
-
-### Notifications
-
-```bash
-# Telegram (get critical/high findings instantly)
-sudo m7hunter -u target.com --deep \
-  --telegram-token 1234567890:AAB... \
-  --telegram-chat -100123456789
-
-# Discord
-sudo m7hunter -u target.com --deep \
-  --discord-webhook https://discord.com/api/webhooks/...
-```
-
-### API Keys
-
-```bash
-sudo m7hunter -u target.com --deep \
-  --github-token ghp_xxx \
-  --shodan-key xxx \
-  --vt-key xxx
-```
-
-### Config File
-
-```bash
-# Copy config template
-cp config/m7hunter.yaml ~/.m7hunter.yaml
-
-# Edit with your keys
-nano ~/.m7hunter.yaml
-
-# Use
-sudo m7hunter -u target.com --deep -c ~/.m7hunter.yaml
-```
-
-### Custom Steps
-
-```bash
-sudo m7hunter -u target.com --custom \
-  --ssrf --xss --sqli --ssti --jwt --graphql
+sudo m7hunter -u target.com --deep          # Both phases
+sudo m7hunter -u target.com --fast          # Phase 1 only
+sudo m7hunter -u target.com --phase1-only   # Same as --fast
 ```
 
 ---
 
-## 🧠 Pipeline (21 Steps)
+## 📊 Confidence Scoring Engine
+
+Every finding gets a confidence score (0.0–1.0):
 
 ```
-Target Input
-     │
-     ├─ Step 01: Subdomain Enumeration (subfinder + amass + crt.sh + wayback + gau)
-     ├─ Step 02: DNS Resolution (dnsx + dig records)
-     ├─ Step 03: HTTP Probe (httpx + gau + waybackurls)
-     ├─ Step 04: Port Scan (naabu + nmap — FIXED)
-     ├─ Step 05: Web Crawl + JS Mining (katana + hakrawler + trufflehog)
-     │
-     ╔══════════════ PARALLEL VULN SCANNING ══════════════╗
-     ║                                                      ║
-     ├─ Step 06: Nuclei (custom templates + auth support)  ║
-     ├─ Step 07: XSS + Blind XSS via OOB                   ║
-     ├─ Step 08: SQLi (confirmed-only findings — FIXED)    ║
-     ├─ Step 09: CORS Misconfiguration                     ║
-     ├─ Step 10: LFI Detection                             ║
-     ├─ Step 11: SSRF + OOB Blind SSRF                     ║
-     ├─ Step 12: Open Redirect                             ║
-     ├─ Step 13: Subdomain Takeover (subzy — FIXED)        ║
-     ├─ Step 14: Screenshots (gowitness)                   ║
-     ├─ Step 15: WordPress Scan                            ║
-     ├─ Step 16: GitHub Dorking (leaked secrets)           ║
-     ├─ Step 17: Cloud Assets (S3/GCP/Azure)               ║
-     ├─ Step 18: SSTI Detection                            ║
-     ├─ Step 19: JWT Analysis + Brute Force                ║
-     ├─ Step 20: GraphQL Introspection                     ║
-     ├─ Step 21: Host Header Injection                     ║
-     ╚══════════════════════════════════════════════════════╝
-     │
-     └─ Report (HTML + JSON + Markdown)
+Signal weights:
+  Confirmed pattern (root:x:, ami-id)  → +0.95–0.99
+  OOB callback received                → +0.95
+  Payload unencoded reflection         → +0.35
+  Content-length diff >500 bytes       → +0.30
+  Error signal in response             → +0.20
+  Timing delay >5s (blind vulns)       → +0.40
+  AI confirms                          → +0.20
+  
+FP weights:
+  "connection refused" in SSRF         → -0.50
+  HTML-encoded reflection in XSS       → -0.20
+  AI marks as FP                       → -0.30
+
+Thresholds:
+  ≥ 0.85 → confirmed
+  ≥ 0.50 → potential
+  < 0.50 → discarded
+```
+
+```bash
+sudo m7hunter -u target.com --deep --confidence 0.9  # Stricter (less noise)
+sudo m7hunter -u target.com --deep --confidence 0.6  # More findings
 ```
 
 ---
 
-## 📊 Reports
+## 🔍 Proof Engine
 
-Three report formats generated automatically:
+For every **confirmed** finding, generates:
 
-- **HTML** — Dark themed, filterable by severity, searchable
-- **JSON** — Machine readable, import into your tools
-- **Markdown** — HackerOne/Bugcrowd submission ready
+```json
+{
+  "curl_command": "curl -sk ...",
+  "raw_http": "GET /page?file=../etc/passwd HTTP/1.1\r\nHost: ...",
+  "repro_steps": [
+    "1. Open Burp Suite...",
+    "2. Navigate to URL...",
+    "3. Inject payload..."
+  ],
+  "impact": "Attacker can read arbitrary files...",
+  "remediation": "Use realpath() to validate...",
+  "cvss_vector": {"vector": "CVSS:3.1/AV:N/...", "score": 7.5},
+  "references": ["https://portswigger.net/..."]
+}
+```
+
+```bash
+sudo m7hunter -u target.com --deep --proof
+```
 
 ---
 
-## 🔎 Scanning Modules
+## 🌐 OSINT Module
 
-| Module | Tools Used |
-|--------|-----------|
-| Subdomain | subfinder, amass, crt.sh, waybackurls, gau, dnsx |
-| DNS | dnsx, dig |
-| Probe | httpx, gau, waybackurls |
-| Ports | naabu, nmap |
-| Crawl | katana, hakrawler, arjun, trufflehog |
-| Nuclei | nuclei (custom templates supported) |
-| XSS | dalfox, kxss + blind XSS via Interactsh |
-| SQLi | sqlmap (confirmed findings only) |
-| CORS | curl |
-| LFI | ffuf + direct probe |
-| SSRF | gf + OOB via Interactsh + AWS/GCP/Azure probes |
-| Redirect | curl + bypass payloads |
-| Takeover | subzy, nuclei |
-| Screenshot | gowitness |
-| WordPress | wpscan |
-| GitHub | GitHub API dorking |
-| Cloud | S3/GCP/Azure bucket enumeration |
-| SSTI | polyglot payloads (Jinja2/Twig/Freemarker/Velocity) |
-| JWT | alg:none, weak secret brute, RS256→HS256 |
-| GraphQL | introspection, batching |
-| Host Header | injection + password reset poisoning |
+```bash
+sudo m7hunter -u target.com --osint
+
+# With API keys for deeper coverage:
+sudo m7hunter -u target.com --osint \
+  --shodan-key YOUR_KEY \
+  --censys-id YOUR_ID \
+  --censys-secret YOUR_SECRET \
+  --github-token ghp_xxx
+```
+
+**Sources:**
+| Source | Free | Key Needed | What it finds |
+|--------|------|-----------|---------------|
+| crt.sh | ✅ | No | Subdomains via SSL certs |
+| AlienVault OTX | ✅ | No | Passive DNS, IPs |
+| URLScan.io | ✅ | No | Historical scans, URLs |
+| Shodan | Partial | Yes | Exposed services, ports |
+| Censys | Partial | Yes | TLS intel, hidden subdomains |
+| GitHub | Partial | Token | Leaked secrets, .env files |
+| VirusTotal | Partial | Yes | Passive DNS, subdomains |
+
+**Flow:** `crt.sh → Shodan/Censys → dnsx → httpx`
+
+---
+
+## 📱 Telegram Bot Control
+
+```bash
+# Start bot
+sudo m7hunter --telegram-bot --telegram-token TOKEN
+
+# Available commands in Telegram:
+/scan target.com --deep    # Start scan
+/pause                      # Pause current scan
+/resume                     # Resume scan
+/stop                       # Stop scan
+/status                     # Current status
+/findings                   # Latest findings
+/critical                   # Critical/High only
+/stats                      # Statistics
+/ai <question>              # Ask AI
+/analyze                    # Run analysis
+/check                      # Tool status
+/help                       # All commands
+```
+
+---
+
+## 🧠 Open Your Brain
+
+View all stored intelligence data:
+
+```bash
+sudo m7hunter --open-your-brain
+# Prompts for admin credentials
+# Interactive menu with 9 options:
+# 1. Encrypted DB contents
+# 2. Scan sessions history
+# 3. Pattern learning data
+# 4. AI training data stats
+# 5. Audit logs
+# 6. Payload success rates
+# 7. Top findings across all scans
+# 8. Export all data to JSON
+# 9. Add admin note
+```
+
+---
+
+## 📊 Risk Scoring
+
+CVSS-like score for every finding:
+
+```
+Score = (Exploitability × 0.30) + (Impact × 0.35) +
+        (Confidence × 0.20) + (Automation × 0.15)
+
+Severity:
+  9.0-10.0 → Critical
+  7.0-8.9  → High
+  4.0-6.9  → Medium
+  0.1-3.9  → Low
+
+Example scores:
+  SQLi confirmed by sqlmap  → 9.6 (Critical)
+  SSRF AWS metadata         → 8.2 (High)
+  XSS reflected             → 6.8 (Medium)
+  Open Redirect             → 2.4 (Low)
+```
+
+---
+
+## 📋 All Commands
+
+```bash
+# Scanning
+sudo m7hunter -u target.com --fast             # Phase 1 only
+sudo m7hunter -u target.com --deep             # Full pipeline
+sudo m7hunter -u target.com --stealth --tor    # Stealth + Tor
+sudo m7hunter -f targets.txt --deep            # Multiple targets
+sudo m7hunter -u target.com --continuous       # Continuous mode
+
+# V5 Features
+sudo m7hunter -u target.com --deep --osint     # + OSINT
+sudo m7hunter -u target.com --deep --proof     # + Proof generation
+sudo m7hunter -u target.com --deep --auto-exploit  # + Auto-exploit
+sudo m7hunter -u target.com --confidence 0.9   # Strict mode
+
+# Platform
+sudo m7hunter --dashboard                      # Web UI :8719
+sudo m7hunter --telegram-bot                   # Bot mode
+sudo m7hunter --setup-vscode                   # VS Code tasks
+
+# Intelligence
+sudo m7hunter --brain                          # Admin console
+sudo m7hunter --open-your-brain                # Data viewer
+sudo m7hunter --analyze                        # Upgrade report
+sudo m7hunter --setup-ai                       # Install Ollama
+
+# Tools
+sudo m7hunter --install                        # Install all tools
+sudo m7hunter --update                         # Update all tools
+sudo m7hunter --check                          # Check versions
+```
+
+---
+
+## 🧪 108 Custom Templates
+
+105 new + 3 legacy = **108 total**
+
+| Vulnerability | Templates | Strategies |
+|--------------|-----------|-----------|
+| SSRF | 7 | AWS metadata, OOB blind, baseline compare, POST body, IP bypass, header injection, GCP/Azure |
+| XSS | 7 | Reflected HTML, attribute, DOM sinks, stored, WAF bypass, JSON API, CSP bypass |
+| LFI | 7 | Unix passwd proof, encoding bypass, Windows, PHP wrappers, log poisoning, /proc/self, SSRF chain |
+| SQL Injection | 7 | Error-based, boolean blind, time-based, UNION, OOB, auth bypass, second-order |
+| IDOR | 7 | Numeric ID, UUID, REST API, horizontal privesc, HPP, GraphQL, JWT claim |
+| XXE | 7 | Basic, blind OOB, SOAP, SVG upload, Excel, parameter entity, XInclude |
+| JWT | 7 | Alg none, weak secret, RS256→HS256, no expiry, kid injection, exposure, cookie theft |
+| CORS | 7 | Wildcard, reflected+creds, null origin, subdomain trust, pre-domain, HTTP, missing Vary |
+| Open Redirect | 7 | Basic, bypass techniques, OAuth, javascript:, data: URI, CRLF, POST |
+| SSTI | 7 | Polyglot, Jinja2 RCE, Twig RCE, Freemarker, Velocity, baseline compare, header |
+| Takeover | 7 | Dangling CNAME, GitHub Pages, AWS S3, Azure, Heroku, Fastly, Shopify |
+| Host Header | 7 | Basic, password reset, cache poisoning, OOB, routing bypass, absolute URL, SSRF chain |
+| GraphQL | 7 | Introspection, SQLi, batch DoS, IDOR, mutations, field suggestion, depth limit |
+| Command Injection | 7 | Basic, blind time, OOB, POST, JSON, file upload, headers |
+| Secrets/Exposure | 7 | .env files, AWS keys, .git, Firebase, Swagger, Kubernetes, debug endpoints |
 
 ---
 
@@ -215,7 +293,7 @@ M7Hunter is for **authorized testing only**.
 - Penetration testing with explicit written permission
 - Systems you own
 
-Unauthorized use is illegal. You are responsible for your actions.
+Unauthorized use is illegal. You are responsible.
 
 ---
 
@@ -223,18 +301,6 @@ Unauthorized use is illegal. You are responsible for your actions.
 
 M7 License v2.0 — See LICENSE file.
 
----
-
 ## 👨‍💻 Author
 
-**Sharlix**  
-MilkyWay Intelligence  
-GitHub: [@httpsm7](https://github.com/httpsm7)
-
----
-
-## ⭐ Support
-
-⭐ Star the repo  
-🐛 Report bugs  
-🔧 Submit PRs
+**Sharlix** | MilkyWay Intelligence | [@httpsm7](https://github.com/httpsm7)
