@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+a#!/usr/bin/env bash
 # ═══════════════════════════════════════════════════════════════════
 #   M7HUNTER v7.0 — One-Click Installer
 #   NEW: httpx[http2], playwright, websockets, asyncio tools
