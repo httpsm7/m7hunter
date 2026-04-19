@@ -229,6 +229,18 @@ def main():
         log.success(f"AI: {offline_ai.get_status()}")
     except Exception: pass
 
+    # Ollama AI
+    ollama_ai = None
+    try:
+        from integrations.ollama_ai import OllamaAI
+        ollama_ai = OllamaAI(log=log)
+        if ollama_ai.is_available():
+            log.success("Ollama AI: online ✓")
+        else:
+            log.warn("Ollama AI: offline (start: ollama serve && ollama pull llama3)")
+    except Exception as _e:
+        log.warn(f"Ollama: {_e}")
+
     # Notifier
     notifier = None
     tg_token = getattr(args,'telegram_token',None)
