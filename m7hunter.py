@@ -270,6 +270,34 @@ def main():
     log.success(f"Targets: {len(targets)}")
 
     # ── Run ───────────────────────────────────────────────────────────
+    # Auto-start dashboard + print URL
+    import threading as _th
+    _dash_port = getattr(args,'dashboard_port',8719)
+
+    def _start_bg_dashboard():
+        try:
+            from web.server import Dashboard
+            d = Dashboard(log=log, port=_dash_port, ollama_ai=ollama_ai)
+            d.start(blocking=False)
+        except Exception as _de:
+            pass
+
+    _th.Thread(target=_start_bg_dashboard, daemon=True).start()
+    import time as _t2; _t2.sleep(0.3)
+    log.success(f"")
+    log.success(f"  🌐  Live Dashboard: http://localhost:{_dash_port}")
+    log.success(f"  Open in browser while scan runs!")
+    log.success(f"")
+
+    # Auto-start Ollama
+    if not ollama_ai or not ollama_ai.is_available():
+        try:
+            from integrations.ollama_manager import OllamaManager
+            _om = OllamaManager(log=log)
+            _th.Thread(target=_om.setup, daemon=True).start()
+        except Exception:
+            pass
+
     def run_all():
         from core.pipeline_v7 import PipelineV7
         reports = []
