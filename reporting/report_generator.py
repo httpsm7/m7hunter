@@ -71,8 +71,9 @@ class ReportGeneratorV6:
     def _get_sorted_findings(self) -> list:
         """FIX: Get findings from pipeline — uses new FindingsEngine if available."""
         # Try new engine first
-        if hasattr(self.p, 'findings_engine'):
-            return self.p.findings_engine.get_all()
+        fe = getattr(self.p, 'findings_engine', None)
+        if fe is not None and hasattr(fe, 'get_all'):
+            return fe.get_all()
         # Fallback to legacy pipeline.findings list
         findings = list(getattr(self.p, 'findings', []))
         order = {"critical": 0, "high": 1, "medium": 2, "low": 3, "info": 4}
